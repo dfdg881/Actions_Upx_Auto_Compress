@@ -1,0 +1,48 @@
+ 
+name: Download and Compress AdGuardHome with UPX
+
+on:
+  workflow_dispatch: # 手动触发
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Download AdGuardHome
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const response = await github.rest.repos.getLatestRelease({
+            owner: 'AdGuard',
+            repo: 'AdGuardHome'
+          });
+          const asset = response.data.assets.find(a => a.name.includes('AdGuardHome_linux_arm64.tar.gz'));
+          return asset.browser_download_url;
+
+    - name: Save AdGuardHome download URL
+      id: adguardhome_url
+      run: echo "::set-output name=url::$URL"
+
+    - name: Download and Extract AdGuardHome
+      run: |
+        curl -L "${{ steps.adguardhome_url.outputs.url }}" -o adguardhome.tar.gz
+        mkdir AdGuardHome
+        tar -xzf adguardhome.tar.gz -C ./AdGuardHome --strip-components=1
+
+    - name: Compress AdGuardHome with UPX
+      uses: crazy-max/ghaction-upx@v3
+      with:
+        version: latest
+        files: ./AdGuardHome/AdGuardHome
+        args: --best
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: AdGuardHome_upx
+        path: ./AdGuardHome/AdGuardHome
+ 
