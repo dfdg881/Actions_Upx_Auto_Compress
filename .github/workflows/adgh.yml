@@ -35,10 +35,10 @@ jobs:
         uses: crazy-max/ghaction-upx@v3
         with:
           version: latest
-          files: $(pwd)/alist-linux-arm64/alist
+          files: /home/runner/work/AdguardHome-arm64_Upx/AdguardHome-arm64_Upx/alist-linux-arm64/alist
           args: --best
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Alist_upx
-          path: $(pwd)/alist-linux-arm64/alist
+          path: /home/runner/work/AdguardHome-arm64_Upx/AdguardHome-arm64_Upx/alist-linux-arm64/alist
