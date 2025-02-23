@@ -4,41 +4,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 允许上传 Artifact
+      actions: read    # 允许跨仓库访问
     steps:
-    - name: Checkout repository
+    - name: Checkout current repo
       uses: actions/checkout@v3
+      # 移除非必要的 repository 参数，默认使用当前仓库
 
-    - name: Get Latest Release Info
+    - name: Get Alist Release Info
       id: get_release
       uses: actions/github-script@v5
       with:
         script: |
           const response = await github.rest.repos.getLatestRelease({
-            owner: 'AlistGo',  // 关键修正点
-            repo: 'alist'
+            owner: 'AlistGo',  # 关键修正
+            repo: 'alist'      # 指定正确仓库
           });
-          
-          // 精确匹配 ARM64 压缩包
           const asset = response.data.assets.find(a => 
-            a.name === 'alist-linux-arm64.tar.gz' // 严格名称匹配
+            a.name === 'alist-linux-arm64.tar.gz'
           );
-          
           if (!asset) throw new Error('ARM64 asset not found');
-          return {
+          return { 
             url: asset.browser_download_url,
-            version: response.data.tag_name.replace(/^v/, '') // 去除版本号前的v
+            version: response.data.tag_name 
           };
 
-    - name: Download and Validate
+    - name: Download and Extract
       run: |
-        # 下载指定版本
-        curl -L "${{ steps.get_release.outputs.result.url }}" \
-          -o alist.tar.gz
-        
-        # 验证文件完整性
-        tar -ztvf alist.tar.gz | grep -q 'alist$' || (echo "::error::Invalid file structure"; exit 1)
-        
-        # 解压文件
+        curl -L "${{ steps.get_release.outputs.result.url }}" -o alist.tar.gz
         tar -xzf alist.tar.gz
         chmod +x alist
 
@@ -46,21 +40,10 @@ jobs:
       uses: crazy-max/ghaction-upx@v3
       with:
         files: ./alist
-        args: --best --lzma
-
-    - name: Package Artifact
-      run: |
-        # 重命名文件包含版本号
-        COMPRESSED_NAME="alist-upx_${{ steps.get_release.outputs.result.version }}_arm64"
-        mv alist $COMPRESSED_NAME
-        
-        # 生成校验文件
-        sha256sum $COMPRESSED_NAME > $COMPRESSED_NAME.sha256
+        args: --best
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: alist-upx-arm64
-        path: |
-          ./alist-upx_*_arm64
-          ./*.sha256
+        path: ./alist
