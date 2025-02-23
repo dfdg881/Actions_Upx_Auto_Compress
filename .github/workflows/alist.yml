@@ -18,19 +18,19 @@ jobs:
         id: release_info
         run: |
           RELEASE_INFO=$(curl -s "https://api.github.com/repos/AlistGo/alist/releases/latest")
-          DOWNLOAD_URL=$(echo $RELEASE_INFO | jq -r --arg ASSET_NAME "alist-linux-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
+          DOWNLOAD_URL=$(echo $RELEASE_INFO | jq -r --arg ASSET_NAME "alist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
           echo "Download URL: $DOWNLOAD_URL"
           if [ -z "$DOWNLOAD_URL" ]; then
-            echo "Error: Download URL not found for alist-linux-arm64.tar.gz"
+            echo "Error: Download URL not found for alist-linux-musl-arm64.tar.gz"
             exit 1
           fi
           echo "::set-output name=download_url::$DOWNLOAD_URL"
-          echo "::set-output name=asset_name::alist-linux-arm64.tar.gz"
+          echo "::set-output name=asset_name::alist-linux-musl-arm64.tar.gz"
       - name: Download and extract Alist
         run: |
           curl -L -o ${{ steps.release_info.outputs.asset_name }} ${{ steps.release_info.outputs.download_url }}
           tar xvvf ${{ steps.release_info.outputs.asset_name }}  # 使用 tar xvvf 解压
-          echo "Alist extracted to $(pwd)/alist-linux-arm64"
+          echo "Alist extracted to $(pwd)/alist-linux-musl-arm64"
       - name: Run UPX on Alist executable
         uses: crazy-max/ghaction-upx@v3
         with:
