@@ -1,46 +1,66 @@
-name: Download and Compress AdGuardHome with UPX
-
+name: Build UPX-Compressed Alist
 on:
-  workflow_dispatch:  # 手动触发
-
+  workflow_dispatch:
 jobs:
-  compress:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+    - name: Get Latest Release Info
+      id: get_release
+      uses: actions/github-script@v5
+      with:
+        script: |
+          const response = await github.rest.repos.getLatestRelease({
+            owner: 'AlistGo',  // 关键修正点
+            repo: 'alist'
+          });
+          
+          // 精确匹配 ARM64 压缩包
+          const asset = response.data.assets.find(a => 
+            a.name === 'alist-linux-arm64.tar.gz' // 严格名称匹配
+          );
+          
+          if (!asset) throw new Error('ARM64 asset not found');
+          return {
+            url: asset.browser_download_url,
+            version: response.data.tag_name.replace(/^v/, '') // 去除版本号前的v
+          };
 
-      - name: Get latest release information
-        id: release_info
-        run: |
-          RELEASE_INFO=$(curl -s "https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest")
-          DOWNLOAD_URL=$(echo $RELEASE_INFO | jq -r --arg ASSET_NAME "AdGuardHome_linux_arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
-          echo "Download URL: $DOWNLOAD_URL"
-          if [ -z "$DOWNLOAD_URL" ]; then
-            echo "Error: Download URL not found for AdGuardHome_linux_arm64.tar.gz"
-            exit 1
-          fi
-          echo "::set-output name=download_url::$DOWNLOAD_URL"
-          echo "::set-output name=asset_name::AdGuardHome_linux_arm64.tar.gz"
+    - name: Download and Validate
+      run: |
+        # 下载指定版本
+        curl -L "${{ steps.get_release.outputs.result.url }}" \
+          -o alist.tar.gz
+        
+        # 验证文件完整性
+        tar -ztvf alist.tar.gz | grep -q 'alist$' || (echo "::error::Invalid file structure"; exit 1)
+        
+        # 解压文件
+        tar -xzf alist.tar.gz
+        chmod +x alist
 
-      - name: Download and extract AdGuardHome
-        run: |
-          curl -L -o ${{ steps.release_info.outputs.asset_name }} ${{ steps.release_info.outputs.download_url }}
-          tar xvvf ${{ steps.release_info.outputs.asset_name }}  # 使用 tar xvvf 解压
-          echo "AdGuardHome extracted to $(pwd)/AdGuardHome"
+    - name: UPX Compress
+      uses: crazy-max/ghaction-upx@v3
+      with:
+        files: ./alist
+        args: --best --lzma
 
-      - name: Run UPX on AdGuardHome executable
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: latest
-          files: ./AdGuardHome/AdGuardHome
-          args: --best
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AdGuardHome_upx
-          path: ./AdGuardHome/AdGuardHome
+    - name: Package Artifact
+      run: |
+        # 重命名文件包含版本号
+        COMPRESSED_NAME="alist-upx_${{ steps.get_release.outputs.result.version }}_arm64"
+        mv alist $COMPRESSED_NAME
+        
+        # 生成校验文件
+        sha256sum $COMPRESSED_NAME > $COMPRESSED_NAME.sha256
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: alist-upx-arm64
+        path: |
+          ./alist-upx_*_arm64
+          ./*.sha256
