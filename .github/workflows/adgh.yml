@@ -1,48 +1,44 @@
- 
 name: Download and Compress AdGuardHome with UPX
 
 on:
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:  # 手动触发
 
 jobs:
   compress:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Download AdGuardHome
-      uses: actions/github-script@v5
-      with:
-        script: |
-          const response = await github.rest.repos.getLatestRelease({
-            owner: 'AdGuard',
-            repo: 'AdGuardHome'
-          });
-          const asset = response.data.assets.find(a => a.name.includes('AdGuardHome_linux_arm64.tar.gz'));
-          return asset.browser_download_url;
+      - name: Set up jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
-    - name: Save AdGuardHome download URL
-      id: adguardhome_url
-      run: echo "::set-output name=url::$URL"
-
-    - name: Download and Extract AdGuardHome
-      run: |
-        curl -L "${{ steps.adguardhome_url.outputs.url }}" -o adguardhome.tar.gz
-        mkdir AdGuardHome
-        tar -xzf adguardhome.tar.gz -C ./AdGuardHome --strip-components=1
-
-    - name: Compress AdGuardHome with UPX
-      uses: crazy-max/ghaction-upx@v3
-      with:
-        version: latest
-        files: ./AdGuardHome/AdGuardHome
-        args: --best
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: AdGuardHome_upx
-        path: ./AdGuardHome/AdGuardHome
- 
+      - name: Get latest release information
+        id: release_info
+        run: |
+          RELEASE_INFO=$(curl -s "https://api.github.com/repos/AlistGo/alist/releases/latest")
+          DOWNLOAD_URL=$(echo $RELEASE_INFO | jq -r --arg ASSET_NAME "alist-linux-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
+          echo "Download URL: $DOWNLOAD_URL"
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "Error: Download URL not found for alist-linux-arm64.tar.gz"
+            exit 1
+          fi
+          echo "::set-output name=download_url::$DOWNLOAD_URL"
+          echo "::set-output name=asset_name::alist-linux-arm64.tar.gz"
+      - name: Download and extract AdGuardHome
+        run: |
+          curl -L -o ${{ steps.release_info.outputs.asset_name }} ${{ steps.release_info.outputs.download_url }}
+          tar xvvf ${{ steps.release_info.outputs.asset_name }}  # 使用 tar xvvf 解压
+          echo "Alist extracted to $(pwd)/alist-linux-arm64"
+      - name: Run UPX on Alist executable
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: ./alist-linux-arm64/alist
+          args: --best
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Alist_upx
+          path: ./alist-linux-arm64/alist
