@@ -1,12 +1,9 @@
 name: Download and Compress Alist with UPX
-
 on:
   workflow_dispatch:  # 手动触发
-
 jobs:
   compress:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -17,28 +14,53 @@ jobs:
       - name: Get latest release information
         id: release_info
         run: |
-          RELEASE_INFO=$(curl -s "https://api.github.com/repos/AlistGo/alist/releases/latest")
-          DOWNLOAD_URL=$(echo $RELEASE_INFO | jq -r --arg ASSET_NAME "alist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
-          echo "Download URL: $DOWNLOAD_URL"
-          if [ -z "$DOWNLOAD_URL" ]; then
-            echo "Error: Download URL not found for alist-linux-musl-arm64.tar.gz"
+          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/AlistGo/alist/releases/latest")
+          if [ -z "$RELEASE_INFO" ]; then
+            echo "::error::Failed to fetch release information"
             exit 1
           fi
-          echo "::set-output name=download_url::$DOWNLOAD_URL"
-          echo "::set-output name=asset_name::alist-linux-musl-arm64.tar.gz"
+          
+          # 提取版本号（去除可能的v前缀）
+          VERSION=$(echo "$RELEASE_INFO" | jq -r '.tag_name | ltrimstr("v")')
+          if [ -z "$VERSION" ]; then
+            echo "::error::Failed to extract version number"
+            exit 1
+          fi
+
+          # 提取下载地址
+          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "alist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "::error::Download URL not found for alist-linux-musl-arm64.tar.gz"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "asset_name=alist-linux-musl-arm64.tar.gz" >> $GITHUB_OUTPUT
+
       - name: Download and extract Alist
         run: |
-          curl -L -o ${{ steps.release_info.outputs.asset_name }} ${{ steps.release_info.outputs.download_url }}
-          tar xvvf ${{ steps.release_info.outputs.asset_name }}  # 使用 tar xvvf 解压
-          echo "Alist extracted to $(pwd)/alist-linux-musl-arm64"
+          set -e
+          curl -L -o "${{ steps.release_info.outputs.asset_name }}" "${{ steps.release_info.outputs.download_url }}"
+          tar xvvf "${{ steps.release_info.outputs.asset_name }}"
+          echo "Alist extracted to $(pwd)/alist"
+
       - name: Run UPX on Alist executable
         uses: crazy-max/ghaction-upx@v3
         with:
           version: latest
           files: ./alist
           args: --best --no-color
+
+      - name: Validate compressed file
+        run: |
+          if [ ! -f ./alist ]; then
+            echo "::error::Alist executable not found after compression"
+            exit 1
+          fi
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Alist_upx
+          name: Alist_${{ steps.release_info.outputs.version }}_upx
           path: ./alist
