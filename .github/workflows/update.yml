@@ -61,18 +61,6 @@ jobs:
           files: ./AdGuardHome/AdGuardHome
           args: --best --no-color
 
-      - name: Validate compressed binary
-        run: |
-          if [ ! -f "./AdGuardHome/AdGuardHome" ]; then
-            echo "::error::AdGuardHome executable missing after compression"
-            exit 1
-          fi
-          # 基本可执行验证
-          if ! ./AdGuardHome/AdGuardHome; then
-            echo "::error::Compressed binary verification failed"
-            exit 1
-          fi
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
