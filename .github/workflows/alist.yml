@@ -1,11 +1,14 @@
-name: Download and Compress Alist with UPX
+name: Download and Compress AdGuardHome with UPX
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 手动触发
     inputs:
       upx_args:
         description: 'UPX compression parameters (e.g. -9 --best)'
         required: false
-        default: '-9'
+        default: '--best'
+
+env:
+  UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
 
 jobs:
   compress:
