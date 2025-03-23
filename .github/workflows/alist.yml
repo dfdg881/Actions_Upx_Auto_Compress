@@ -47,7 +47,6 @@ jobs:
           echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
           echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
-
        - name: Download and setup UPX
         run: |
           set -ex
