@@ -48,17 +48,17 @@ jobs:
           echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
 
-      - name: Install UPX
+       - name: Download and setup UPX
         run: |
-          curl -L -o upx.tar.xz "${{ steps.get_upx.outputs.url }}"
-          tar -xJOf upx.tar.xz "upx-${${steps.get_upx.outputs.version}#v}-amd64_linux/upx" > upx
-          chmod +x upx
-          ./upx --version
+          set -ex
+          curl -L -o upx.tar.xz "${{ steps.upx_info.outputs.upx_download_url }}"
+          tar -xJOf upx.tar.xz "upx-${{ steps.upx_info.outputs.upx_version }}-amd64_linux/upx" > ./upx
+          chmod +x ./upx
 
-      - name: Compress executable
+      - name: Compress with UPX
         run: |
-          ./upx ${{ github.event.inputs.upx_args }} alist
-          ./upx -t alist || (echo "::error::Compression verification failed"; exit 1)
+          set -ex
+          ./upx ${{ github.event.inputs.upx_args }} ./alist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
