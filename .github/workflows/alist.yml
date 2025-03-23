@@ -1,6 +1,12 @@
 name: Download and Compress Alist with UPX
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
+    inputs:
+      upx_args:
+        description: 'UPX compression parameters (e.g. -9 --best)'
+        required: false
+        default: '-9'
+
 jobs:
   compress:
     runs-on: ubuntu-latest
@@ -8,59 +14,50 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up jq
+      - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Get latest release information
-        id: release_info
+      - name: Get Alist release info
+        id: get_alist
         run: |
-          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/AlistGo/alist/releases/latest")
-          if [ -z "$RELEASE_INFO" ]; then
-            echo "::error::Failed to fetch release information"
-            exit 1
-          fi
+          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/AlistGo/alist/releases/latest")
+          VERSION=$(jq -r '.tag_name | ltrimstr("v")' <<< "$RELEASE_JSON")
+          URL=$(jq -r '.assets[] | select(.name == "alist-linux-musl-arm64.tar.gz").browser_download_url' <<< "$RELEASE_JSON")
           
-          # 提取版本号（去除可能的v前缀）
-          VERSION=$(echo "$RELEASE_INFO" | jq -r '.tag_name | ltrimstr("v")')
-          if [ -z "$VERSION" ]; then
-            echo "::error::Failed to extract version number"
-            exit 1
-          fi
-
-          # 提取下载地址
-          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "alist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
-          if [ -z "$DOWNLOAD_URL" ]; then
-            echo "::error::Download URL not found for alist-linux-musl-arm64.tar.gz"
-            exit 1
-          fi
-
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "asset_name=alist-linux-musl-arm64.tar.gz" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
 
       - name: Download and extract Alist
         run: |
-          set -e
-          curl -L -o "${{ steps.release_info.outputs.asset_name }}" "${{ steps.release_info.outputs.download_url }}"
-          tar xvvf "${{ steps.release_info.outputs.asset_name }}"
-          echo "Alist extracted to $(pwd)/alist"
+          curl -L -o alist.tar.gz "${{ steps.get_alist.outputs.url }}"
+          tar zxvf alist.tar.gz
+          rm alist.tar.gz
+          chmod +x alist
 
-      - name: Run UPX on Alist executable
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: 5.0.0
-          files: ./alist
-          args: --best
-
-      - name: Validate compressed file
+      - name: Get UPX release info
+        id: get_upx
         run: |
-          if [ ! -f ./alist ]; then
-            echo "::error::Alist executable not found after compression"
-            exit 1
-          fi
+          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
+          VERSION=$(jq -r '.tag_name' <<< "$RELEASE_JSON")
+          URL=$(jq -r '.assets[] | select(.name | endswith("amd64_linux.tar.xz")).browser_download_url' <<< "$RELEASE_JSON")
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Install UPX
+        run: |
+          curl -L -o upx.tar.xz "${{ steps.get_upx.outputs.url }}"
+          tar -xJOf upx.tar.xz "upx-${${steps.get_upx.outputs.version}#v}-amd64_linux/upx" > upx
+          chmod +x upx
+          ./upx --version
+
+      - name: Compress executable
+        run: |
+          ./upx ${{ github.event.inputs.upx_args }} alist
+          ./upx -t alist || (echo "::error::Compression verification failed"; exit 1)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Alist_${{ steps.release_info.outputs.version }}_upx
-          path: ./alist
+          name: alist_${{ steps.get_alist.outputs.version }}_upx
+          path: alist
