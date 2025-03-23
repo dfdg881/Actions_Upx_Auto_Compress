@@ -1,14 +1,9 @@
 name: Download and Compress Alist with UPX
 on:
   workflow_dispatch:  # 手动触发
-    inputs:
-      upx_args:
-        description: 'UPX compression parameters (e.g. -9 --best)'
-        required: false
-        default: '--best'
 
 env:
-  UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
+  UPX_ARGS: "--best --lzma"  #  用户自定义UPX参数
 
 jobs:
   compress:
@@ -17,50 +12,77 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Set up jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Get Alist release info
-        id: get_alist
+        id: alist_release
         run: |
-          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/AlistGo/alist/releases/latest")
-          VERSION=$(jq -r '.tag_name | ltrimstr("v")' <<< "$RELEASE_JSON")
-          URL=$(jq -r '.assets[] | select(.name == "alist-linux-musl-arm64.tar.gz").browser_download_url' <<< "$RELEASE_JSON")
-          
+          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/AlistGo/alist/releases/latest")
+          VERSION=$(echo "$RELEASE_INFO" | jq -r '.tag_name | ltrimstr("v")')
+          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "alist-linux-musl-arm64.tar.gz") | .browser_download_url')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
       - name: Download and extract Alist
         run: |
-          curl -L -o alist.tar.gz "${{ steps.get_alist.outputs.url }}"
-          tar zxvf alist.tar.gz
+          curl -L -o alist.tar.gz "${{ steps.alist_release.outputs.download_url }}"
+          tar xzvf alist.tar.gz
           rm alist.tar.gz
-          chmod +x alist
+          echo "Alist extracted to $(pwd)/alist"
 
-      - name: Get UPX latest version
-        id: upx_info
+      - name: Validate executable
         run: |
-          UPX_INFO=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
-          UPX_VERSION=$(echo "$UPX_INFO" | jq -r '.tag_name | ltrimstr("v")')
-          UPX_DOWNLOAD_URL=$(echo "$UPX_INFO" | jq -r '.assets[] | select(.name | test(".*amd64_linux.tar.xz$")) | .browser_download_url')
+          if [ ! -f ./alist ]; then
+            echo "::error::Alist executable not found"
+            exit 1
+          fi
+
+      - name: Get UPX release info
+        id: upx_release
+        run: |
+          #  通过GitHub API获取最新版本
+          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
+          VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name | ltrimstr("v")')
           
-          echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
-          echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          #  动态构建资产名称
+          ARCH=$(uname -m)
+          case "$ARCH" in
+            x86_64)  SUFFIX="amd64_linux" ;;
+            aarch64) SUFFIX="arm64_linux" ;;
+            *)       echo "::error::Unsupported architecture $ARCH"; exit 1 ;;
+          esac
+          
+          ASSET_NAME="upx-$VERSION-$SUFFIX.tar.xz"
+          DOWNLOAD_URL=$(echo "$RELEASE_JSON" | jq -r --arg name "$ASSET_NAME" '.assets[] | select(.name == $name).browser_download_url')
+          
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "::error::UPX asset not found for $ASSET_NAME"
+            exit 1
+          fi
+          
+          echo "asset_name=$ASSET_NAME" >> $GITHUB_OUTPUT
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
-       - name: Download and setup UPX
+      - name: Install UPX
         run: |
-          set -ex
-          curl -L -o upx.tar.xz "${{ steps.upx_info.outputs.upx_download_url }}"
-          tar -xJOf upx.tar.xz "upx-${{ steps.upx_info.outputs.upx_version }}-amd64_linux/upx" > ./upx
-          chmod +x ./upx
+          #  解压并安装二进制
+          curl -L -o upx.tar.xz "${{ steps.upx_release.outputs.download_url }}"
+          mkdir -p upx-bin
+          tar xvf upx.tar.xz -C upx-bin --strip-components=1
+          sudo install upx-bin/upx /usr/local/bin/
+          rm -rf upx-bin upx.tar.xz
+          upx --version
 
       - name: Compress with UPX
         run: |
-          set -ex
-          ./upx ${{ github.event.inputs.upx_args }} ./alist
+          #  使用自定义参数执行压缩
+          echo "Original size: $(du -h ./alist)"
+          upx ${{ env.UPX_ARGS }} ./alist
+          echo "Compressed size: $(du -h ./alist)"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: alist_${{ steps.get_alist.outputs.version }}_upx
-          path: alist
+          name: Alist_${{ steps.alist_release.outputs.version }}_upx
+          path: ./alist
