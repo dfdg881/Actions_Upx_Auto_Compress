@@ -1,4 +1,4 @@
-name: Download and Compress AdGuardHome with UPX
+name: Download and Compress Alist with UPX
 on:
   workflow_dispatch:  # 手动触发
     inputs:
