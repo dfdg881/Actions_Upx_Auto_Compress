@@ -50,7 +50,7 @@ jobs:
         with:
           version: latest
           files: ./alist
-          args: --best --no-color
+          args: --best --ultra-brute
 
       - name: Validate compressed file
         run: |
