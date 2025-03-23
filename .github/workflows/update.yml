@@ -57,9 +57,9 @@ jobs:
       - name: Run UPX compression
         uses: crazy-max/ghaction-upx@v3
         with:
-          version: latest
+          version: 5.0.0
           files: ./AdGuardHome/AdGuardHome
-          args: --best --no-color
+          args: --best --ultra-brute
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
