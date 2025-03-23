@@ -37,15 +37,16 @@ jobs:
           rm alist.tar.gz
           chmod +x alist
 
-      - name: Get UPX release info
-        id: get_upx
+      - name: Get UPX latest version
+        id: upx_info
         run: |
-          RELEASE_JSON=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
-          VERSION=$(jq -r '.tag_name' <<< "$RELEASE_JSON")
-          URL=$(jq -r '.assets[] | select(.name | endswith("amd64_linux.tar.xz")).browser_download_url' <<< "$RELEASE_JSON")
+          UPX_INFO=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
+          UPX_VERSION=$(echo "$UPX_INFO" | jq -r '.tag_name | ltrimstr("v")')
+          UPX_DOWNLOAD_URL=$(echo "$UPX_INFO" | jq -r '.assets[] | select(.name | test(".*amd64_linux.tar.xz$")) | .browser_download_url')
           
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
+          echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
 
       - name: Install UPX
         run: |
