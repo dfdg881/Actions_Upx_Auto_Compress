@@ -26,7 +26,7 @@ jobs:
         
       - name: Setup Environment
         run: |
-          mkdir -p "${{ github.event.inputs.save_path }}"
+          mkdir -p ${{ github.event.inputs.save_path }}
           echo "WORKDIR=$(pwd)" >> $GITHUB_ENV
           
       - name: Get UPX latest version
@@ -58,9 +58,10 @@ jobs:
           
       - name: Compress with UPX
         run: |
-          chmod +x "${{ env.DOWNLOADED_FILE }}"
-          ./upx ${{ github.event.inputs.upx_args }} "${{ env.DOWNLOADED_FILE }}"
-          mv "${{ env.DOWNLOADED_FILE }}" "${{ github.event.inputs.save_path }}"
+          set -ex
+          chmod +x ${{ env.DOWNLOADED_FILE }}
+          ./upx ${{ github.event.inputs.upx_args }} ./${{ env.DOWNLOADED_FILE }}
+          mv ${{ env.DOWNLOADED_FILE }} ${{ github.event.inputs.save_path }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
