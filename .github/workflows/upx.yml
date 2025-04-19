@@ -67,5 +67,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.DOWNLOADED_FILE }}compressed
+          name: ${{ env.DOWNLOADED_FILE }} compressed
           path: "${{ github.event.inputs.save_path }}/${{ env.DOWNLOADED_FILE }}"
