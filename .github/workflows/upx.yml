@@ -1,0 +1,55 @@
+name: Custom File Download and Compress with UPX
+on:
+  workflow_dispatch:   # 手动触发
+    inputs:
+      file_url:
+        description: '直链下载地址（必填）'
+        required: true
+      save_path:
+        description: '文件保存路径（默认：./）'
+        required: false
+        default: './'
+      upx_args:
+        description: 'UPX压缩参数（默认：--best）'
+        required: false
+        default: '--best'
+
+env:
+  UPX_VERSION: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Environment
+        run: |
+          mkdir -p "${{ github.event.inputs.save_path }}"
+          echo "WORKDIR=$(pwd)" >> $GITHUB_ENV
+
+      - name: Download File
+        run: |
+          FILENAME=$(basename "${{ github.event.inputs.file_url }}")
+          curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
+          echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
+
+      - name: Setup UPX
+        run: |
+          curl -LO "https://github.com/upx/upx/releases/download/v$UPX_VERSION/upx-$UPX_VERSION-amd64_linux.tar.xz"
+          tar -xJf upx-*.tar.xz
+          mv upx-*/upx /usr/local/bin/
+          upx --version
+
+      - name: Compress with UPX
+        run: |
+          chmod +x "${{ env.DOWNLOADED_FILE }}"
+          upx ${{ github.event.inputs.upx_args }} "${{ env.DOWNLOADED_FILE }}"
+          mv "${{ env.DOWNLOADED_FILE }}" "${{ github.event.inputs.save_path }}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compressed_$(date +%s)
+          path: "${{ github.event.inputs.save_path }}/${{ env.DOWNLOADED_FILE }}"
