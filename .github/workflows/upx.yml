@@ -59,7 +59,7 @@ jobs:
       - name: Compress with UPX
         run: |
           chmod +x "${{ env.DOWNLOADED_FILE }}"
-          upx ${{ github.event.inputs.upx_args }} "${{ env.DOWNLOADED_FILE }}"
+          ./upx ${{ github.event.inputs.upx_args }} "${{ env.DOWNLOADED_FILE }}"
           mv "${{ env.DOWNLOADED_FILE }}" "${{ github.event.inputs.save_path }}"
 
       - name: Upload Artifact
