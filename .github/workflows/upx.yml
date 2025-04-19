@@ -3,19 +3,19 @@ on:
   workflow_dispatch:   # 手动触发
     inputs:
       file_url:
-        description: '直链下载地址（必填）'
+        description: 'url'
         required: true
       save_path:
         description: '文件保存路径（默认：./）'
         required: false
         default: './'
       upx_args:
-        description: 'UPX压缩参数（默认：--best）'
+        description: 'upx_args'
         required: false
         default: '--best'
 
 env:
-  UPX_VERSION: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
+  UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
 
 jobs:
   compress:
@@ -28,7 +28,18 @@ jobs:
         run: |
           mkdir -p "${{ github.event.inputs.save_path }}"
           echo "WORKDIR=$(pwd)" >> $GITHUB_ENV
+          
+      - name: Get UPX latest version
+        id: upx_info
+        run: |
+          UPX_INFO=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
+          UPX_VERSION=$(echo "$UPX_INFO" | jq -r '.tag_name | ltrimstr("v")')
+          UPX_DOWNLOAD_URL=$(echo "$UPX_INFO" | jq -r '.assets[] | select(.name | test(".*amd64_linux.tar.xz$")) | .browser_download_url')
+      
+      - name: Set up jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
+     
       - name: Download File
         run: |
           FILENAME=$(basename "${{ github.event.inputs.file_url }}")
@@ -42,6 +53,13 @@ jobs:
           mv upx-*/upx /usr/local/bin/
           upx --version
 
+      - name: Download and setup UPX
+        run: |
+          set -ex
+          curl -L -o upx.tar.xz "${{ steps.upx_info.outputs.upx_download_url }}"
+          tar -xJOf upx.tar.xz "upx-${{ steps.upx_info.outputs.upx_version }}-amd64_linux/upx" > ./upx
+          chmod +x ./upx
+          
       - name: Compress with UPX
         run: |
           chmod +x "${{ env.DOWNLOADED_FILE }}"
