@@ -1,19 +1,22 @@
 name: Custom File Download and Compress with UPX
 on:
-  workflow_dispatch:   # 手动触发
+  workflow_dispatch:
     inputs:
       file_url:
         description: 'url'
         required: true
+      file_name:
+        description: 'file_name'
+        required: false
+        default: 'fz'
       save_path:
-        description: '文件保存路径（默认：./）'
+        description: 'save_path'
         required: false
         default: './'
       upx_args:
         description: 'upx_args'
         required: false
         default: '--best'
-
 env:
   UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
 
@@ -45,10 +48,9 @@ jobs:
      
       - name: Download File
         run: |
-          FILENAME= file
+          FILENAME="${{ github.event.inputs.file_name || 'fz' }}"
           curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
           echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
-
       - name: Download and setup UPX
         run: |
           set -ex
