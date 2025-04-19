@@ -45,7 +45,7 @@ jobs:
      
       - name: Download File
         run: |
-          FILENAME= mefrp
+          FILENAME= file
           curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
           echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
 
@@ -65,5 +65,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: compressed_$(date +%s)
+          name: compressed
           path: "${{ github.event.inputs.save_path }}/${{ env.DOWNLOADED_FILE }}"
