@@ -45,7 +45,7 @@ jobs:
      
       - name: Download File
         run: |
-          FILENAME=$(basename "${{ github.event.inputs.file_url }}")
+          FILENAME= mefrp
           curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
           echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
 
