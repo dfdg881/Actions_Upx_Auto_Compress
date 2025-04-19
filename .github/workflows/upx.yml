@@ -35,6 +35,9 @@ jobs:
           UPX_INFO=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
           UPX_VERSION=$(echo "$UPX_INFO" | jq -r '.tag_name | ltrimstr("v")')
           UPX_DOWNLOAD_URL=$(echo "$UPX_INFO" | jq -r '.assets[] | select(.name | test(".*amd64_linux.tar.xz$")) | .browser_download_url')
+          
+          echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
+          echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
       
       - name: Set up jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -45,7 +48,6 @@ jobs:
           FILENAME=$(basename "${{ github.event.inputs.file_url }}")
           curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
           echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
-
 
       - name: Download and setup UPX
         run: |
