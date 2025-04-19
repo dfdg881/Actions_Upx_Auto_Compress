@@ -8,7 +8,7 @@ on:
       file_name:
         description: 'file_name'
         required: false
-        default: 'fz'
+        default: 'example'
       save_path:
         description: 'save_path'
         required: false
@@ -67,5 +67,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: compressed
+          name: ${{ env.DOWNLOADED_FILE }}compressed
           path: "${{ github.event.inputs.save_path }}/${{ env.DOWNLOADED_FILE }}"
