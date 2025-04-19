@@ -46,12 +46,6 @@ jobs:
           curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
           echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
 
-      - name: Setup UPX
-        run: |
-          curl -LO "https://github.com/upx/upx/releases/download/v$UPX_VERSION/upx-$UPX_VERSION-amd64_linux.tar.xz"
-          tar -xJf upx-*.tar.xz
-          mv upx-*/upx /usr/local/bin/
-          upx --version
 
       - name: Download and setup UPX
         run: |
