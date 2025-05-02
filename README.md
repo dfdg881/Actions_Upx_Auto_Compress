@@ -1,5 +1,5 @@
 <div align="center">
-  <h1 align="center">Action_Upx_Auto_Compress</h1>
+  <h1 align="center">Actions_Upx_Auto_Compress</h1>
 </div>
 
 <div align="center">一个自动化下载指定软件最新版本并使用UPX工具进行压缩的项目，可减少人工操作，提高效率🚀</div>
