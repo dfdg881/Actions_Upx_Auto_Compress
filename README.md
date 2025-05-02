@@ -82,4 +82,4 @@
 
 ## 许可证
 
-[MIT](./LICENSE) License &copy; 2025 - PRESENT [作者信息（待补充）](https://github.com/作者用户名（待补充）)
+[MIT](./LICENSE) License &copy; 2025 - PRESENT [dfdg881](https://github.com/dfdg881)
