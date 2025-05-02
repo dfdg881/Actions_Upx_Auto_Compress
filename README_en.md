@@ -8,7 +8,7 @@
   <!-- You can add some status icons for the project here, such as version, download volume, etc. Since there is no specific information, it is not added for now. -->
 </p>
 
-[English](./README_en.md) | Chinese
+English | [Chinese](./README.md)
 
 ### Project Navigation
 - [Features](#Features)
