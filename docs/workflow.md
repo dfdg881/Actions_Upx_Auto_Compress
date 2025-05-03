@@ -13,9 +13,9 @@
 ## 三、运行
 ### （一）选择工作流
 ### Download and Compress Alist with UPX
-下载最新版本的Arm64[Alist](https://github.com/AlistGo/alist) 软件，并使用 UPX 工具对其进行压缩
+下载最新Arm64版本的[Alist](https://github.com/AlistGo/alist) 软件，并使用 UPX 工具对其进行压缩
 ### Download and Compress AdGuardHome with UPX
-下载最新版本的 Arm64[AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)软件，并使用 UPX 工具对其进行压缩
+下载最新Arm64版本的[AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)软件，并使用 UPX 工具对其进行压缩
 ### ustom File Download and Compress with UPX
 自定义下载文件的 URL，根据用户提供的文件 URL 下载文件，并使用 UPX 工具对其进行压缩
 
@@ -23,7 +23,7 @@
 
 ### （二）触发工作流
 
-这些工作流都通过 workflow_dispatch 手动触发。在 Actions 页面中，找到您想要运行的工作流文件（如 Download and Compress AdGuardHome with UPX），点击该工作流旁边的“Run workflow”按钮。
+在 Actions 页面中，找到您想要运行的工作流名称（如 Download and Compress AdGuardHome with UPX），点击该工作流后点击旁边的“Run workflow”按钮。
 
 ### （三）填写输入参数
 ### Download and Compress AdGuardHome with UPX Download and Compress Alist with UPX
