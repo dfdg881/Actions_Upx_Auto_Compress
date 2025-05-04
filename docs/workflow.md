@@ -1,7 +1,7 @@
 # 详细教程
 
 ## 一、Fork 项目
-打开项目仓库页面，在页面右上角点击“Fork”按钮。这会将原仓库的代码复制到您自己的 GitHub 账户下。
+打开项目仓库页面，在页面右上角点击`Fork`按钮。这会将原仓库的代码复制到您自己的 GitHub 账户下。
 ![fork](./images/fork-btn.png 'fork')
 
 在弹出的确认页面中，选择将仓库复制到您希望的位置，通常是您自己的账户。确认信息无误后，点击“Fork”按钮完成复制。
@@ -29,7 +29,7 @@
 
 ### （二）触发工作流
 
-在 Actions 页面中，找到您想要运行的工作流名称（如 Download and Compress AdGuardHome with UPX），点击该工作流后点击旁边的“Run workflow”按钮
+在 Actions 页面中，找到您想要运行的工作流名称（如 Download and Compress AdGuardHome with UPX），点击该工作流后点击旁边的`Run workflow`按钮
 ![run workflow](./images/run.png 'run workflow')
 
 
