@@ -11,6 +11,7 @@
 进入您 Fork 后的仓库页面。
 在仓库页面的导航栏中，找到并点击`Actions`选项卡。
 ![Actions入口](./images/actions-btn.png 'Actions入口')
+
 2. 开启 Actions 工作流：
 ![开启Actions工作流](./images/actions-enable.png '开启Actions工作流')
 
