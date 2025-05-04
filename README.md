@@ -2,7 +2,7 @@
   <h1 align="center">Actions_Upx_Auto_Compress</h1>
 </div>
 
-<div align="center">一个自动化下载指定软件最新版本并使用[upx](https://github.com/upx/upx)进行压缩的项目，可减少人工操作，提高效率</div>
+<div align="center">一个自动化下载指定软件最新版本并使用upx进行压缩的项目，可减少人工操作，提高效率</div>
 <br>
 <p align="center">
   <!-- 这里可添加项目的一些状态图标，如版本、下载量等，由于没有具体信息，暂不添加 -->
@@ -22,7 +22,7 @@
 ## 特点
 
 - ✅ 自动化：实现了软件下载、压缩和工件上传的自动化，减少了人工操作的繁琐。
-- ✅ 灵活性：用户可以根据需要自定义UPX的压缩参数，还可以在`Custom File Download and Compress with UPX`中自定义要下载的文件。
+- ✅ 灵活性：用户可以根据需要自定义[upx](https://github.com/upx/upx)的压缩参数，还可以在`Custom File Download and Compress with UPX`中自定义要下载的文件。
 - ✅ 版本管理：确保每次运行工作流时都使用最新版本的软件进行压缩。
 
 
