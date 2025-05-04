@@ -62,5 +62,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AdGuardHome_${{ steps.release_info.outputs.version }}_upx
+          name: AdGuardHome_${{ steps.release_info.outputs.version }}_upx_arm64
           path: ./AdGuardHome/AdGuardHome
