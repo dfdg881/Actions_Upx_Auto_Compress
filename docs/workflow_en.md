@@ -4,7 +4,7 @@
 Open the project repository page and click the `Fork` button in the upper right - hand corner of the page. This will copy the code of the original repository to your own GitHub account.
 ![fork](./images/fork-btn.png 'fork')
 
-On the pop - up confirmation page, select the location where you want to copy the repository, usually your own account. After confirming that the information is correct, click the "Crrate Fork" button to complete the copying.
+On the pop - up confirmation page, select the location where you want to copy the repository, usually your own account. After confirming that the information is correct, click the `Crrate Fork` button to complete the copying.
 
 ![fork2](./images/fork-detail.png 'fork2')
 
@@ -29,7 +29,7 @@ Select the corresponding workflow branch according to your needs.
 ![Select Workflow Branch](./images/choose.png 'Select Workflow Branch')
 
 ### (2) Trigger the Workflow
-On the Actions page, find the name of the workflow you want to run (e.g., Download and Compress AdGuardHome with UPX). Click on the workflow and then click the "Run workflow" button next to it.
+On the Actions page, find the name of the workflow you want to run (e.g., Download and Compress AdGuardHome with UPX). Click on the workflow and then click the `Run workflow` button next to it.
 ![run workflow](./images/run.png 'run workflow')
 
 According to the [GitHub Documentation](https://docs.github.com/en/actions), workflows can be triggered by various events. In addition to the manually triggered workflow_dispatch, they can also be triggered by events such as push and pull_request.
