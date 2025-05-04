@@ -6,9 +6,10 @@
 
 ## 二、打开 Action
 进入您 Fork 后的仓库页面。
-在仓库页面的导航栏中，找到并点击“Actions”选项卡。如果这是您第一次打开该仓库的 Actions 页面，可能会看到一个提示，告知您需要启用工作流。按照提示点击相应的按钮启用工作流。
-工作流触发方式补充
-根据 [GitHub 文档](https://docs.github.com/zh/actions)，工作流可以通过多种事件触发，除了手动触发的 workflow_dispatch，还可以通过 push、pull_request 等事件触发。
+在仓库页面的导航栏中，找到并点击`Actions`选项卡。
+![Actions入口](./images/actions-btn.png 'Actions入口')
+2. 开启 Actions 工作流：
+![开启Actions工作流](./images/actions-enable.png '开启Actions工作流')
 
 ## 三、运行
 ### （一）选择工作流
@@ -20,7 +21,7 @@
 自定义下载文件的 URL，根据用户提供的文件 URL 下载文件，并使用 UPX 工具对其进行压缩
 
 根据您的需求，选择相应的工作流文件。
-
+根据 [GitHub 文档](https://docs.github.com/zh/actions)，工作流可以通过多种事件触发，除了手动触发的 workflow_dispatch，还可以通过 push、pull_request 等事件触发。
 ### （二）触发工作流
 
 在 Actions 页面中，找到您想要运行的工作流名称（如 Download and Compress AdGuardHome with UPX），点击该工作流后点击旁边的“Run workflow”按钮。
