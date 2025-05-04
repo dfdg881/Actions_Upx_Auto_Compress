@@ -35,7 +35,7 @@
 
 根据 [GitHub 文档](https://docs.github.com/zh/actions)，工作流可以通过多种事件触发，除了手动触发的 workflow_dispatch，还可以通过 push、pull_request 等事件触发。
 
-### （三）填写输入参数
+`参数`
 ### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
 `upx_args`:用于指定 UPX 的压缩参数，默认为 --best。如需修改参数，例如使用 --ultra-brute 压缩模式，可以在触发工作流时将 `upx_args` 设置为 --ultra-brute。
 ### Custom File Download and Compress with UPX
