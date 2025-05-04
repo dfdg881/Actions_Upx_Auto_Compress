@@ -2,7 +2,7 @@
   <h1 align="center">Actions_Upx_Auto_Compress</h1>
 </div>
 
-<div align="center">一个自动化下载指定软件最新版本并使用[UPX](https://github.com/upx/upx)进行压缩的项目，可减少人工操作，提高效率</div>
+<div align="center">一个自动化下载指定软件最新版本并使用[upx](https://github.com/upx/upx)进行压缩的项目，可减少人工操作，提高效率</div>
 <br>
 <p align="center">
   <!-- 这里可添加项目的一些状态图标，如版本、下载量等，由于没有具体信息，暂不添加 -->
