@@ -13,6 +13,7 @@
 ![Actions入口](./images/actions-btn.png 'Actions入口')
 
 2. 开启 Actions 工作流：
+
 ![开启Actions工作流](./images/actions-enable.png '开启Actions工作流')
 
 ## 三、运行
