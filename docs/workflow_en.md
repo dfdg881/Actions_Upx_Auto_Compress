@@ -1,6 +1,6 @@
 # Detailed Tutorial
 
-## 1. Fork the Project
+## 1. Fork the Repository
 Open the project repository page and click the "Fork" button in the upper right corner of the page. This will copy the code of the original repository to your own GitHub account.
 On the pop - up confirmation page, select the location where you want to copy the repository, usually your own account. After confirming that the information is correct, click the "Fork" button to complete the copy.
 
