@@ -32,8 +32,8 @@
 在 Actions 页面中，找到您想要运行的工作流名称（如 `Download and Compress AdGuardHome with UPX`），点击该工作流后点击旁边的`Run workflow`按钮
 ![run workflow](./images/run.png 'run workflow')
 
-`可填写参数`
-### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
+#### 可填写参数
+##### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
 `upx_args`:用于指定 UPX 的压缩参数，默认为 --best。如需修改参数，例如使用 --ultra-brute 压缩模式，可以在触发工作流时将 `upx_args` 设置为 --ultra-brute。
 ### Custom File Download and Compress with UPX
 `file_url`：文件下载 URL。(直链)
