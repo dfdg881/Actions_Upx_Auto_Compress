@@ -8,7 +8,7 @@ On the pop - up confirmation page, select the location where you want to copy th
 Enter the page of the repository you forked.
 In the navigation bar of the repository page, find and click the "Actions" tab. If this is the first time you open the Actions page of this repository, you may see a prompt informing you that you need to enable the workflow. Follow the prompt and click the corresponding button to enable the workflow.
 Supplementary information on workflow triggering methods
-According to the [GitHub Documentation](https://docs.github.com/en/actions), workflows can be triggered by various events. In addition to the manually triggered workflow_dispatch, they can also be triggered by events such as push and pull_request.
+According to the [GitHub Docs](https://docs.github.com/en/actions), workflows can be triggered by various events. In addition to the manually triggered workflow_dispatch, they can also be triggered by events such as push and pull_request.
 
 ## 3. Run
 ### (1) Select a Workflow
