@@ -41,7 +41,6 @@
 `save_path`：文件的保存路径，默认为当前工作目录。
 `upx_args`：可根据需要修改 UPX 的压缩参数，默认为 --best。
 填写完参数后点击旁边绿色的`Run workflow`按钮开始运行
-根据 [GitHub 文档](https://docs.github.com/zh/actions)，工作流可以通过多种事件触发，除了手动触发的 workflow_dispatch，还可以通过 push、pull_request 等事件触发。
 
 ## 四、下载upx压缩后的文件
 当工作流运行成功后，在 Actions 页面中找到刚刚运行的工作流记录，点击进入该记录的详情页面。
