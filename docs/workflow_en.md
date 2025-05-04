@@ -28,8 +28,9 @@ Customize the URL of the file to be downloaded. Download the file according to t
 Select the corresponding workflow branch according to your needs.
 ![Select Workflow Branch](./images/choose.png 'Select Workflow Branch')
 
+On the Actions page, find the name of the workflow you want to run (e.g., Download and Compress AdGuardHome with UPX). Then click it.
 ### (2) Trigger the Workflow
-On the Actions page, find the name of the workflow you want to run (e.g., Download and Compress AdGuardHome with UPX). 
+
 
 ### Fill in the Input Parameters
 #### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
