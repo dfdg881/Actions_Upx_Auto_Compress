@@ -22,7 +22,7 @@ English | [中文](./README.md)
 ## Features
 
 - ✅ Automation: Automates software download, compression, and artifact upload, reducing the complexity of manual operations.
-- ✅ Flexibility: Users can customize the compression parameters of UPX as needed and can also customize the files to be downloaded in `upx.yml`.
+- ✅ Flexibility: Users can customize the compression parameters of UPX as needed and can also customize the files to be downloaded in `Custom File Download and Compress with UPX`.
 - ✅ Version Management: Ensures that the latest version of the software is used for compression every time the workflow runs by obtaining the latest version information of the software.
 
 
