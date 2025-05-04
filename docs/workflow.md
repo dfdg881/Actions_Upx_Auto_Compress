@@ -35,7 +35,7 @@
 #### 可填写参数
 ##### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
 `upx_args`:用于指定 UPX 的压缩参数，默认为 --best。如需修改参数，例如使用 --ultra-brute 压缩模式，可以在触发工作流时将 `upx_args` 设置为 --ultra-brute。
-### Custom File Download and Compress with UPX
+##### Custom File Download and Compress with UPX
 `file_url`：文件下载 URL。(直链)
 `file_name`：下载文件的名称，默认为 example。
 `save_path`：文件的保存路径，默认为当前工作目录。
