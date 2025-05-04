@@ -32,18 +32,16 @@
 在 Actions 页面中，找到您想要运行的工作流名称（如 `Download and Compress AdGuardHome with UPX`），点击该工作流后点击旁边的`Run workflow`按钮
 ![run workflow](./images/run.png 'run workflow')
 
-
-根据 [GitHub 文档](https://docs.github.com/zh/actions)，工作流可以通过多种事件触发，除了手动触发的 workflow_dispatch，还可以通过 push、pull_request 等事件触发。
-
-`参数`
+`可填写参数`
 ### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
 `upx_args`:用于指定 UPX 的压缩参数，默认为 --best。如需修改参数，例如使用 --ultra-brute 压缩模式，可以在触发工作流时将 `upx_args` 设置为 --ultra-brute。
 ### Custom File Download and Compress with UPX
-需要填写以下参数：
 `file_url`：文件下载 URL。(直链)
 `file_name`：下载文件的名称，默认为 example。
 `save_path`：文件的保存路径，默认为当前工作目录。
 `upx_args`：可根据需要修改 UPX 的压缩参数，默认为 --best。
+
+根据 [GitHub 文档](https://docs.github.com/zh/actions)，工作流可以通过多种事件触发，除了手动触发的 workflow_dispatch，还可以通过 push、pull_request 等事件触发。
 
 ## 四、下载upx压缩后的文件
 当工作流运行成功后，在 Actions 页面中找到刚刚运行的工作流记录，点击进入该记录的详情页面。
