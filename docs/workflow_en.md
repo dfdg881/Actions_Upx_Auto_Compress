@@ -31,10 +31,10 @@ Select the corresponding workflow branch according to your needs.
 ### (2) Trigger the Workflow
 On the Actions page, find the name of the workflow you want to run (e.g., Download and Compress AdGuardHome with UPX). 
 
-#### Fill in the Input Parameters
-### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
+### Fill in the Input Parameters
+#### Download and Compress AdGuardHome with UPX | Download and Compress Alist with UPX
 `upx_args`: Used to specify the compression parameters of UPX, with the default being --best. If you need to modify the parameters, for example, use the --ultra-brute compression mode, you can set `upx_args` to --ultra-brute when triggering the workflow.
-### Custom File Download and Compress with UPX
+#### Custom File Download and Compress with UPX
 The following parameters need to be filled in:
 `file_url`: The direct download URL of the file.
 `file_name`: The name of the downloaded file, with the default being example.
