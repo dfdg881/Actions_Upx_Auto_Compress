@@ -42,7 +42,7 @@ jobs:
           echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
           echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
       
-      - name: Set up jq
+      - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
      
