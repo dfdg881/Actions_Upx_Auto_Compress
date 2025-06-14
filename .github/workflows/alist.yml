@@ -23,7 +23,7 @@ jobs:
       - name: Get latest release information
         id: release_info
         run: |
-          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/AlistGo/alist/releases/latest")
+          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/")
           if [ -z "$RELEASE_INFO" ]; then
             echo "::error::Failed to fetch release information"
             exit 1
