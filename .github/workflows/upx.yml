@@ -17,6 +17,10 @@ on:
         description: 'upx_args'
         required: false
         default: '--best'
+      Is zip file:
+        description: 'zip'
+        required: false
+        default: 'false'
 env:
   UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
 
@@ -51,6 +55,7 @@ jobs:
           FILENAME="${{ github.event.inputs.file_name || 'fz' }}"
           curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
           echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
+
       - name: Download and setup UPX
         run: |
           set -ex
@@ -59,6 +64,7 @@ jobs:
           chmod +x ./upx
           
       - name: unzipped
+      if: ${{ github.event.inputs.zip }}=='true'
         run: |
           set -ex
           unzip /${{ env.DOWNLOADED_FILE }}
