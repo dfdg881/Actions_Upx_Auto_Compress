@@ -63,12 +63,11 @@ jobs:
           tar -xJOf upx.tar.xz "upx-${{ steps.upx_info.outputs.upx_version }}-amd64_linux/upx" > ./upx
           chmod +x ./upx
           
-      - name: unzipped
-      if: ${{ github.event.inputs.zip }}=='true'
+      - name: unzipped file
+        if: ${{ github.event.inputs.zip }}=='true'
         run: |
           set -ex
           unzip /${{ env.DOWNLOADED_FILE }}
-          ./upx ${{ github.event.inputs.upx_args }} ./${{ env.DOWNLOADED_FILE }}
 
       - name: Compress with UPX
         run: |
