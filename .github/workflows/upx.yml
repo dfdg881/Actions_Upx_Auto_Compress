@@ -67,7 +67,7 @@ jobs:
         if: ${{ github.event.inputs.zip }}=='true'
         run: |
           set -ex
-          unzip /${{ env.DOWNLOADED_FILE }}
+          unzip ${{ env.DOWNLOADED_FILE }}
 
       - name: Compress with UPX
         run: |
