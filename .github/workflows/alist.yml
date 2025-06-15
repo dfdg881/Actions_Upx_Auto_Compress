@@ -37,15 +37,15 @@ jobs:
           fi
 
           # 提取下载地址
-          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "alist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
+          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "openlist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
           if [ -z "$DOWNLOAD_URL" ]; then
-            echo "::error::Download URL not found for alist-linux-musl-arm64.tar.gz"
+            echo "::error::Download URL not found for openlist-linux-musl-arm64.tar.gz"
             exit 1
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "asset_name=alist-linux-musl-arm64.tar.gz" >> $GITHUB_OUTPUT
+          echo "asset_name=openlist-linux-musl-arm64.tar.gz" >> $GITHUB_OUTPUT
           
       - name: Get UPX latest version
         id: upx_info
@@ -57,7 +57,7 @@ jobs:
           echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
           echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
-      - name: Download and extract Alist
+      - name: Download and extract Openlist
         run: |
           set -e
           curl -L -o "${{ steps.release_info.outputs.asset_name }}" "${{ steps.release_info.outputs.download_url }}"
@@ -79,12 +79,12 @@ jobs:
       - name: Validate compressed file
         run: |
           if [ ! -f ./alist ]; then
-            echo "::error::Alist executable not found after compression"
+            echo "::error::Openlist executable not found after compression"
             exit 1
           fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Alist_${{ steps.release_info.outputs.version }}_upx_arm64
-          path: ./alist
+          name: Openlist_${{ steps.release_info.outputs.version }}_upx_arm64
+          path: ./openlist
