@@ -57,9 +57,6 @@ jobs:
           echo "version=$UPX_VERSION" >> $GITHUB_OUTPUT
           echo "download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Download target file
         run: |
           curl -L -o "${{ inputs.file_name }}" "${{ inputs.file_url }}"
