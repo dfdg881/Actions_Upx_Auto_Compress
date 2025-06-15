@@ -23,7 +23,7 @@ jobs:
       - name: Get latest release information
         id: release_info
         run: |
-          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/OpenListTeam/OpenList/releasess/latest")
+          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/OpenListTeam/OpenList/releases/latest")
           if [ -z "$RELEASE_INFO" ]; then
             echo "::error::Failed to fetch release information"
             exit 1
