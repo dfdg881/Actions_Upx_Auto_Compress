@@ -1,112 +1,98 @@
-name: Custom File Download and Compress with UPX
+name: UPX Auto Compress
+
 on:
   workflow_dispatch:
     inputs:
       file_url:
-        description: 'url'
+        description: '要下载的文件URL'
         required: true
+        type: string
       file_name:
-        description: 'file_name'
+        description: '保存的文件名'
         required: false
-        default: 'example'
+        default: 'file'
+        type: string
       save_path:
-        description: 'save_path'
+        description: '保存路径'
         required: false
         default: './'
+        type: string
       upx_args:
-        description: 'upx_args'
+        description: 'UPX压缩参数'
         required: false
         default: '--best'
-      Is .zip file:
-        description: 'zip'
+        type: string
+      file_type:
+        description: '文件类型'
         required: false
-        default: 'false'
-      Is tar.gz file:
-        description: 'targz'
+        default: 'binary'
+        type: choice
+        options:
+          - binary
+          - zip
+          - targz
+      archive_target:
+        description: '压缩包中要处理的文件名(仅适用于zip/targz)'
         required: false
-        default: 'false'
-      tar.gz file name:
-        description: 'targzn'
-        required: false
-        default: 'false'
-env:
-  UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
+        type: string
 
 jobs:
   compress:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Setup Environment
+
+      - name: Setup working directory
         run: |
-          mkdir -p ${{ github.event.inputs.save_path }}
+          mkdir -p ${{ inputs.save_path }}
           echo "WORKDIR=$(pwd)" >> $GITHUB_ENV
-          
-      - name: Get UPX latest version
+
+      - name: Get latest UPX version
         id: upx_info
         run: |
           UPX_INFO=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
           UPX_VERSION=$(echo "$UPX_INFO" | jq -r '.tag_name | ltrimstr("v")')
           UPX_DOWNLOAD_URL=$(echo "$UPX_INFO" | jq -r '.assets[] | select(.name | test(".*amd64_linux.tar.xz$")) | .browser_download_url')
-          
-          echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
-          echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
-      
-      - name: Install jq
+          echo "version=$UPX_VERSION" >> $GITHUB_OUTPUT
+          echo "download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y jq
 
-     
-      - name: Download File
+      - name: Download target file
         run: |
-          FILENAME="${{ github.event.inputs.file_name || 'fz' }}"
-          curl -L -o "${FILENAME}" "${{ github.event.inputs.file_url }}"
-          echo "DOWNLOADED_FILE=${FILENAME}" >> $GITHUB_ENV
+          curl -L -o "${{ inputs.file_name }}" "${{ inputs.file_url }}"
+          echo "TARGET_FILE=${{ inputs.file_name }}" >> $GITHUB_ENV
 
-      - name: Download and setup UPX
+      - name: Setup UPX
         run: |
-          set -ex
-          curl -L -o upx.tar.xz "${{ steps.upx_info.outputs.upx_download_url }}"
-          tar -xJOf upx.tar.xz "upx-${{ steps.upx_info.outputs.upx_version }}-amd64_linux/upx" > ./upx
+          curl -L -o upx.tar.xz "${{ steps.upx_info.outputs.download_url }}"
+          tar -xJf upx.tar.xz --strip-components=1 "upx-${{ steps.upx_info.outputs.version }}-amd64_linux/upx"
           chmod +x ./upx
-          
-      - name: unzipped file
-        if: ${{ github.event.inputs.zip }}=='true'
-        run: |
-          set -ex
-          unzip ${{ env.DOWNLOADED_FILE }}
 
-      - name: tar
-        if: ${{ github.event.inputs.targz }}=='true'
+      - name: Extract archive if needed
+        if: inputs.file_type != 'binary'
         run: |
-          set -ex
-          tar zvvf ${{ env.DOWNLOADED_FILE }}
+          if [ "${{ inputs.file_type }}" = "zip" ]; then
+            unzip "${{ env.TARGET_FILE }}"
+          elif [ "${{ inputs.file_type }}" = "targz" ]; then
+            tar xzf "${{ env.TARGET_FILE }}"
+          fi
 
       - name: Compress with UPX
-        if: ${{ github.event.inputs.zip }}=='false'
         run: |
-          set -ex
-          chmod +x ${{ env.DOWNLOADED_FILE }}
-          ./upx ${{ github.event.inputs.upx_args }} ./${FILENAME}
+          if [ "${{ inputs.file_type }}" = "binary" ]; then
+            chmod +x "${{ env.TARGET_FILE }}"
+            ./upx ${{ inputs.upx_args }} "${{ env.TARGET_FILE }}"
+          else
+            chmod +x "${{ inputs.archive_target }}"
+            ./upx ${{ inputs.upx_args }} "${{ inputs.archive_target }}"
+          fi
 
-      - name: Compress targz with UPX
-        if: ${{ github.event.inputs.targz }}=='false'
-        run: |
-          set -ex
-          chmod +x ${{ github.event.inputs.targzn }}
-          ./upx ${{ github.event.inputs.upx_args }} ./${{ github.event.inputs.targzn }}
-
-      - name: Upload Artifact
-        if: ${{ github.event.inputs.zip }}=='false'
+      - name: Upload compressed file
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.DOWNLOADED_FILE }} compressed
-          path: "${{ github.event.inputs.save_path }}/${{ env.DOWNLOADED_FILE }}"
-
-      - name: Upload Tar Artifact
-        if: ${{ github.event.inputs.targz }}=='true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.DOWNLOADED_FILE }} compressed
-          path: "${{ github.event.inputs.save_path }}/${{ github.event.inputs.targzn }}"
+          name: compressed-files
+          path: |
+            ${{ inputs.file_type == 'binary' && env.TARGET_FILE || inputs.archive_target }}
