@@ -17,8 +17,12 @@ on:
         description: 'upx_args'
         required: false
         default: '--best'
-      Is zip file:
+      Is .zip file:
         description: 'zip'
+        required: false
+        default: 'false'
+      Is tar.gz file:
+        description: 'targz'
         required: false
         default: 'false'
 env:
@@ -68,6 +72,12 @@ jobs:
         run: |
           set -ex
           unzip ${{ env.DOWNLOADED_FILE }}
+
+      - name: unzipped file
+        if: ${{ github.event.inputs.targz }}=='true'
+        run: |
+          set -ex
+          tar zvvf ${{ env.DOWNLOADED_FILE }}
 
       - name: Compress with UPX
         run: |
