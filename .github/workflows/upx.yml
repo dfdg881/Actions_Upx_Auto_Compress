@@ -25,6 +25,10 @@ on:
         description: 'targz'
         required: false
         default: 'false'
+      tar.gz file name:
+        description: 'targzn'
+        required: false
+        default: 'false'
 env:
   UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
 
@@ -73,20 +77,36 @@ jobs:
           set -ex
           unzip ${{ env.DOWNLOADED_FILE }}
 
-      - name: unzipped file
+      - name: tar
         if: ${{ github.event.inputs.targz }}=='true'
         run: |
           set -ex
           tar zvvf ${{ env.DOWNLOADED_FILE }}
 
       - name: Compress with UPX
+        if: ${{ github.event.inputs.zip }}=='false'
         run: |
           set -ex
           chmod +x ${{ env.DOWNLOADED_FILE }}
-          ./upx ${{ github.event.inputs.upx_args }} ./OpenList-linux-musl-arm64
+          ./upx ${{ github.event.inputs.upx_args }} ./${FILENAME}
+
+      - name: Compress targz with UPX
+        if: ${{ github.event.inputs.targz }}=='false'
+        run: |
+          set -ex
+          chmod +x ${{ github.event.inputs.targzn }}
+          ./upx ${{ github.event.inputs.upx_args }} ./${{ github.event.inputs.targzn }}
 
       - name: Upload Artifact
+        if: ${{ github.event.inputs.zip }}=='false'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.DOWNLOADED_FILE }} compressed
           path: "${{ github.event.inputs.save_path }}/${{ env.DOWNLOADED_FILE }}"
+
+      - name: Upload Tar Artifact
+        if: ${{ github.event.inputs.targz }}=='true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DOWNLOADED_FILE }} compressed
+          path: "${{ github.event.inputs.save_path }}/${{ github.event.inputs.targzn }}"
