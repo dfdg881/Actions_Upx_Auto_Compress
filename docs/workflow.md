@@ -18,8 +18,8 @@
 
 ## 三、运行
 ### （一）选择工作流
-### Download and Compress Alist with UPX
-下载最新Arm64版本的[OpenList](https://github.com/O/alist) 软件，并使用 UPX 工具对其进行压缩
+### Download and Compress OpenList with UPX
+下载最新Arm64版本的[OpenList](https://github.com/OpenListTeam/OpenList) 软件，并使用 UPX 工具对其进行压缩
 ### Download and Compress AdGuardHome with UPX
 下载最新Arm64版本的[AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)软件，并使用 UPX 工具对其进行压缩
 ### Custom File Download and Compress with UPX
