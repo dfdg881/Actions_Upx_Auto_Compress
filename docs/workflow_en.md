@@ -19,8 +19,8 @@ In the navigation bar of the repository page, find and click the `Actions` tab.
 
 ## 3. Run
 ### (1) Select the Workflow
-### Download and Compress Alist with UPX
-Download the latest Arm64 version of [Alist](https://github.com/AlistGo/alist) software and compress it using the UPX tool.
+### Download and Compress OpenList with UPX
+Download the latest Arm64 version of [OpenList](https://github.com/OpenListTeam/OpenList) software and compress it using the UPX tool.
 ### Download and Compress AdGuardHome with UPX
 Download the latest Arm64 version of [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome) software and compress it using the UPX tool.
 ### Custom File Download and Compress with UPX
