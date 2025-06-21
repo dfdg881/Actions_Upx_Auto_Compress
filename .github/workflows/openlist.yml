@@ -1,0 +1,90 @@
+name: Download and Compress Openlist with UPX
+on:
+  workflow_dispatch:  # 手动触发
+    inputs:
+      upx_args:
+        description: 'UPX compression parameters'
+        required: false
+        default: '--best'
+
+env:
+  UPX_DOWNLOAD_NAME: "upx-${{ github.event.inputs.upx_version || 'latest' }}-amd64_linux.tar.xz"
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Get latest release information
+        id: release_info
+        run: |
+          RELEASE_INFO=$(curl -sL "https://api.github.com/repos/OpenListTeam/OpenList/releases/latest")
+          if [ -z "$RELEASE_INFO" ]; then
+            echo "::error::Failed to fetch release information"
+            exit 1
+          fi
+          
+          # 提取版本号（去除可能的v前缀）
+          VERSION=$(echo "$RELEASE_INFO" | jq -r '.tag_name | ltrimstr("v")')
+          if [ -z "$VERSION" ]; then
+            echo "::error::Failed to extract version number"
+            exit 1
+          fi
+
+          # 提取下载地址
+          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "openlist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "::error::Download URL not found for openlist-linux-musl-arm64.tar.gz"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "asset_name=openlist-linux-musl-arm64.tar.gz" >> $GITHUB_OUTPUT
+          
+      - name: Get UPX latest version
+        id: upx_info
+        run: |
+          UPX_INFO=$(curl -sL "https://api.github.com/repos/upx/upx/releases/latest")
+          UPX_VERSION=$(echo "$UPX_INFO" | jq -r '.tag_name | ltrimstr("v")')
+          UPX_DOWNLOAD_URL=$(echo "$UPX_INFO" | jq -r '.assets[] | select(.name | test(".*amd64_linux.tar.xz$")) | .browser_download_url')
+          
+          echo "upx_version=$UPX_VERSION" >> $GITHUB_OUTPUT
+          echo "upx_download_url=$UPX_DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
+      - name: Download and extract Openlist
+        run: |
+          set -e
+          curl -L -o "${{ steps.release_info.outputs.asset_name }}" "${{ steps.release_info.outputs.download_url }}"
+          tar xvvf "${{ steps.release_info.outputs.asset_name }}"
+          echo "Alist extracted to $(pwd)/alist"
+
+      - name: Download and setup UPX
+        run: |
+          set -ex
+          curl -L -o upx.tar.xz "${{ steps.upx_info.outputs.upx_download_url }}"
+          tar -xJOf upx.tar.xz "upx-${{ steps.upx_info.outputs.upx_version }}-amd64_linux/upx" > ./upx
+          chmod +x ./upx
+
+      - name: Compress with UPX
+        run: |
+          set -ex
+          ./upx ${{ github.event.inputs.upx_args }} ./openlist
+
+      - name: Validate compressed file
+        run: |
+          if [ ! -f ./alist ]; then
+            echo "::error::Openlist executable not found after compression"
+            exit 1
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Openlist_${{ steps.release_info.outputs.version }}_upx_arm64
+          path: ./openlist
