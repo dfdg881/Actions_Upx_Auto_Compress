@@ -78,7 +78,7 @@ jobs:
 
       - name: Validate compressed file
         run: |
-          if [ ! -f ./alist ]; then
+          if [ ! -f ./openlist ]; then
             echo "::error::Openlist executable not found after compression"
             exit 1
           fi
