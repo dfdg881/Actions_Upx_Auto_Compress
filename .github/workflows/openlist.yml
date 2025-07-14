@@ -37,7 +37,7 @@ jobs:
           fi
 
           # 提取下载地址
-          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "openlist-linux-musl-arm64.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
+          DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r --arg ASSET_NAME "openlist-linux-musl-arm64-lite.tar.gz" '.assets[] | select(.name == $ASSET_NAME) | .browser_download_url')
           if [ -z "$DOWNLOAD_URL" ]; then
             echo "::error::Download URL not found for openlist-linux-musl-arm64.tar.gz"
             exit 1
