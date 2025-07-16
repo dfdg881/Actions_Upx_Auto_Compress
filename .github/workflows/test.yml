@@ -75,7 +75,7 @@ jobs:
         ./upx --best AdGuardHome
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AdGuardHome-${{ matrix.os }}-${{ matrix.arch }}
         path: AdGuardHome
