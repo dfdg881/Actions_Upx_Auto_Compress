@@ -47,11 +47,17 @@ jobs:
         tar -zxvf adguardhome.tar.gz
         mv AdGuardHome/AdGuardHome .
 
+    - name: Set UPX version string
+      id: upx_version_string
+      run: |
+        upx_version_string=$(echo "${{ steps.versions.outputs.upx_version }}" | cut -c2-)
+        echo "upx_version_string=${upx_version_string}" >> $GITHUB_OUTPUT
+
     - name: Download and extract UPX
       run: |
-        upx_url="https://github.com/upx/upx/releases/download/${{ steps.versions.outputs.upx_version }}/upx-${{ steps.versions.outputs.upx_version | cut -c2- }}-${{ matrix.arch }}_linux.tar.xz"
+        upx_url="https://github.com/upx/upx/releases/download/${{ steps.versions.outputs.upx_version }}/upx-${{ steps.upx_version_string.outputs.upx_version_string }}-${{ matrix.arch }}_linux.tar.xz"
         if [[ "${{ matrix.os }}" == "windows" ]]; then
-          upx_url="https://github.com/upx/upx/releases/download/${{ steps.versions.outputs.upx_version }}/upx-${{ steps.versions.outputs.upx_version | cut -c2- }}-win64.zip"
+          upx_url="https://github.com/upx/upx/releases/download/${{ steps.versions.outputs.upx_version }}/upx-${{ steps.upx_version_string.outputs.upx_version_string }}-win64.zip"
         fi
         wget -O upx.tar.xz "${upx_url}"
         if [[ "${{ matrix.os }}" == "windows" ]]; then
