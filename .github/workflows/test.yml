@@ -45,7 +45,8 @@ jobs:
         adguard_url="https://github.com/AdguardTeam/AdGuardHome/releases/download/${{ steps.versions.outputs.adguard_version }}/AdGuardHome_${{ matrix.os }}_${{ matrix.arch }}.tar.gz"
         wget -O adguardhome.tar.gz "${adguard_url}"
         tar -zxvf adguardhome.tar.gz
-        mv AdGuardHome/AdGuardHome .
+        mv AdGuardHome AdGuardHome_temp
+        mv AdGuardHome_temp/AdGuardHome .
 
     - name: Set UPX version string
       id: upx_version_string
