@@ -1,0 +1,41 @@
+name: Build Executables
+
+on:
+  workflow_dispatch:                  # 手动触发
+
+jobs:
+
+  build-linux:
+    runs-on: ubuntu-24.04-arm
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+        cache: 'pip'
+        cache-dependency-path: |
+          **/requirements*.txt
+    
+    
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Build Linux Executable
+      uses: Nuitka/Nuitka-Action@main
+      with:
+        nuitka-version: main
+        script-name: 1.py
+        mode: onefile
+        include-package: socket,struct,select,argparse, time,random,ipaddress,ssl,threading,logging
+        output-file: CursorMagic
+        
+    - name: Upload Linux artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CursorMagic-Linux
+        path: build/CursorMagic
+        include-hidden-files: true
