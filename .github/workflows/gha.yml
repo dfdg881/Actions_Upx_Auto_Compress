@@ -22,22 +22,17 @@ jobs:
 
       - name: PyInstaller build (single file, no console window)
         run: |
-          pyinstaller --onefile \
-                      --clean \
-                      --noconsole \                  # 去掉这行就有终端窗口
-                      --name cf-socks5 \
-                      cf_socks.py                     # ←←← 你的脚本文件名（请确保和实际一样）
-
+          pyinstaller --F 1.py     
       - name: Show build result
         run: |
           echo "=== Build completed ==="
           ls -lh dist/
-          file dist/cf-socks5
-          ldd dist/cf-socks5 || true
+          file dist/1
+          ldd dist/1 || true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: cf-socks5-linux-aarch64
-          path: dist/cf-socks5
+          path: dist/1
           if-no-files-found: error
