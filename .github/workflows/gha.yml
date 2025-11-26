@@ -30,7 +30,7 @@ jobs:
         nuitka-version: main
         script-name: 1.py
         mode: onefile
-        include-package: socket,struct,select,argparse, time,random,ipaddress,ssl,threading,logging
+        include-package: socket,struct,select,argparse,time,random,ipaddress,ssl,threading,logging
         output-file: CursorMagic
         
     - name: Upload Linux artifact
