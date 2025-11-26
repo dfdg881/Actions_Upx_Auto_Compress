@@ -1,26 +1,17 @@
-name: Build aarch64 with PyInstaller
+name: Build aarch64 Executable
 
 on:
   workflow_dispatch:                  # 手动触发
-
+  
 jobs:
-  build-aarch64:
+  build-arm64:
     runs-on: ubuntu-latest
-    # 使用 GitHub 官方提供的 aarch64 自托管 runner 镜像（或者你自己的自托管机）
-    # 这里演示两种方式任选其一：
-
-    # 方式①：使用社区维护的 aarch64 runner（推荐，零配置）
-    # container:
-    #   image: ghcr.io/tyzbit/aarch64-ubuntu-runner:latest
-    #   options: --platform linux/arm64
-
-    # 方式②：使用 actions/runner 的 ARM64 镜像（2025 年已稳定支持）
     container:
-      image: ghcr.io/catthehacker/ubuntu:act-22.04-arm64
+      image: ghcr.io/catthehacker/ubuntu:act-22.04-arm64   # 方式②
       options: --platform linux/arm64
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python 3.11
@@ -28,36 +19,29 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install PyInstaller & dependencies
+      - name: Upgrade pip & install PyInstaller
         run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
+          python3 -m pip install --upgrade pip setuptools wheel
+          pip3 install pyinstaller==6.10.0   # 固定一个在 ARM64 上肯定没问题的版本
 
-      - name: Build with PyInstaller (single file, no console)
+      - name: PyInstaller build (single file, no console window)
         run: |
-          pyinstaller --F \
+          pyinstaller --onefile \
+                      --clean \
+                      --noconsole \                  # 去掉这行就有终端窗口
                       --name cf-socks5 \
-                      1.py          # ←←← 把这里改成你的文件名，例如 cf_socks.py
+                      cf_socks.py                     # ←←← 你的脚本文件名（请确保和实际一样）
 
-      - name: Show generated file
+      - name: Show build result
         run: |
+          echo "=== Build completed ==="
           ls -lh dist/
           file dist/cf-socks5
+          ldd dist/cf-socks5 || true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cf-socks5-aarch64
+          name: cf-socks5-linux-aarch64
           path: dist/cf-socks5
           if-no-files-found: error
-
-      # 可选：Release 时自动附带二进制
-      - name: Create Release & Upload Asset (only on tag)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/cf-socks5
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
