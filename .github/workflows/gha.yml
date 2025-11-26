@@ -28,7 +28,7 @@ jobs:
       uses: Nuitka/Nuitka-Action@main
       with:
         nuitka-version: main
-        script-name: 1.py
+        script-name: ./1.py
         mode: standalone
         include-package: socket,struct,select,argparse,time,random,ipaddress,ssl,threading,logging
         output-file: CursorMagic
