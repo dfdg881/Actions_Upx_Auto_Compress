@@ -22,7 +22,7 @@ jobs:
 
       - name: PyInstaller build (single file, no console window)
         run: |
-          pyinstaller --F 1.py     
+          pyinstaller -F 1.py     
       - name: Show build result
         run: |
           echo "=== Build completed ==="
